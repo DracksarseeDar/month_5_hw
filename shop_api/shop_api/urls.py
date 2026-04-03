@@ -14,6 +14,7 @@ urlpatterns = [
     path('api/v1/product/<int:id>/', views.product_detail_api_view),
     path('api/v1/review/', views.review_list_api_view),
     path('api/v1/review/<int:id>/', views.review_detail_api_view),
+    path('api/v1/products/reviews/', views.product_reviews_list_api_view),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

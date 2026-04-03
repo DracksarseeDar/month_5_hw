@@ -4,6 +4,7 @@ from django.db import models
 class Category(models.Model):
     name = models.CharField(max_length=255, verbose_name='Укажите категорию')
     created_at = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
         return self.name
 
@@ -17,13 +18,14 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
-    
+
 
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews', verbose_name='Продукт')
     author = models.CharField(max_length=100, verbose_name='Автор отзыва')
     text = models.TextField(max_length=322, verbose_name='Отзыв')
-    rating = models.PositiveSmallIntegerField(default=5, verbose_name='Оценка')
+    # rating = models.PositiveSmallIntegerField(default=5, verbose_name='Оценка')
+    stars = models.IntegerField(choices=((i, i) for i in range(1, 6)), default=5)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
