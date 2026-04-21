@@ -1,11 +1,14 @@
 import os
 from pathlib import Path
+from dotenv import read_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+read_dotenv(os.path.join(BASE_DIR, '.env'))
+SECRET_KEY = os.getenv("HOME_KEY")
 
 
-SECRET_KEY = 'django-insecure-(j7@4#o-cz^sfy_u6u5u$kb2hia*9j!o1p+q+to2n$6=g643s+'
+
 
 DEBUG = True
 
@@ -24,6 +27,7 @@ INSTALLED_APPS = [
     'product',
     'users',
     'rest_framework.authtoken',
+    'drf_yasg',
 ]
 
 REST_FRAMEWORK ={
@@ -67,10 +71,15 @@ WSGI_APPLICATION = 'shop_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
+
 
 
 
