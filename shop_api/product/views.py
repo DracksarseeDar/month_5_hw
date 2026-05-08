@@ -11,7 +11,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
 from common.permissions import IsOwner, IsModerator, IsAnonymous
-
+from common.validatiors import validate_age_from_token
 
 class CustomPagination(PageNumberPagination):
     def get_paginated_response(self, data):
@@ -53,7 +53,12 @@ class ProductViewSet(ModelViewSet):
     serializer_class = ProductListSerializer
     pagination_class = CustomPagination
     lookup_field = 'id'
-    
+
+    def perform_create(self, serializer):
+        validate_age_from_token(self.request.auth)
+        
+        serializer.save(owner=self.request.user)
+
     def get_permissions(self):
         if self.action == 'create':
            

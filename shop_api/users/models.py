@@ -6,14 +6,15 @@ from users.managers import CustomUserManager
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     phone_number =models.CharField(max_length=20 ,blank=True , null=True)
-
+    birthdate = models.DateField(blank=True , null=True)
+    birthdate
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     
     objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["phone_number"]
+    REQUIRED_FIELDS = ["phone_number", "birthdate"]
 
     def __str__(self):
         return self.email or ''
