@@ -10,6 +10,8 @@ from .serializers import (
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
+from common.permissions import IsOwner, IsModerator, IsAnonymous
+
 
 class CustomPagination(PageNumberPagination):
     def get_paginated_response(self, data):
@@ -19,7 +21,8 @@ class CustomPagination(PageNumberPagination):
             'previous': self.get_previous_link(),
             'results': data,
         })
-  
+
+
 # Category
 class CategoryListAPIView(ListCreateAPIView):
     queryset = Category.objects.all()
@@ -50,6 +53,19 @@ class ProductViewSet(ModelViewSet):
     serializer_class = ProductListSerializer
     pagination_class = CustomPagination
     lookup_field = 'id'
+    
+    def get_permissions(self):
+        if self.action == 'create':
+           
+            return [IsOwner()]
+            
+        elif self.action in ['list', 'retrieve']:
+            return [(IsAnonymous | IsOwner | IsModerator)()]
+            
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            return [(IsOwner | IsModerator)()]
+            
+        return super().get_permissions()
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -60,7 +76,6 @@ class ProductViewSet(ModelViewSet):
             if self.action == 'retrieve':
                 return ProductDetailSerializer
             return self.serializer_class
-
 
 # Review
 class ReviewListAPIView(ListCreateAPIView):

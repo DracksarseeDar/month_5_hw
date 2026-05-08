@@ -11,7 +11,7 @@ class CategoryListSerializer(serializers.ModelSerializer):
         fields = 'id name products_count'.split()
 
     def get_products_count(self, category):
-        return category.products.count() 
+        return category.products.count()
 
 
 class CategoryDetailSerializer(serializers.ModelSerializer):
@@ -61,13 +61,23 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
 class CategoryValidateSerializer(serializers.Serializer):
     name = serializers.CharField(required=True, min_length=2, max_length=255)
 
+    def create(self, validated_data):
+        return Category.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.save()
+        return instance
+
+
 class ProductValidateSerializer(serializers.Serializer):
     title = serializers.CharField(required=True, min_length=2, max_length=255)
-    description = serializers.CharField(required=False)
-    price = serializers.IntegerField()
+    description = serializers.CharField(required=False, allow_blank=True)
+    price = serializers.IntegerField(min_value=0)
     category_id = serializers.IntegerField(min_value=1)
 
     def validate_category_id(self, category_id):
@@ -76,7 +86,18 @@ class ProductValidateSerializer(serializers.Serializer):
         except Category.DoesNotExist:
             raise ValidationError('Такой категории не существует!')
         return category_id
-    
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        return Product.objects.create(owner=user, **validated_data)
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.description = validated_data.get('description', instance.description)
+        instance.price = validated_data.get('price', instance.price)
+        instance.category_id = validated_data.get('category_id', instance.category_id)
+        instance.save()
+        return instance
 
 
 class ReviewValidateSerializer(serializers.Serializer):
@@ -88,5 +109,15 @@ class ReviewValidateSerializer(serializers.Serializer):
         try:
             Product.objects.get(id=product_id)
         except Product.DoesNotExist:
-            raise ValidationError('такого продукта не существует!')
+            raise ValidationError('Такого продукта не существует!')
         return product_id
+
+    def create(self, validated_data):
+        return Review.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.text = validated_data.get('text', instance.text)
+        instance.stars = validated_data.get('stars', instance.stars)
+        instance.product_id = validated_data.get('product_id', instance.product_id)
+        instance.save()
+        return instance
