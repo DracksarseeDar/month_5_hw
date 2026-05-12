@@ -7,6 +7,12 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 CustomUser = get_user_model()
 
+
+class OAuthCodeSerializer(serializers.Serializer):
+    code = serializers.CharField()
+
+
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -31,6 +37,8 @@ class AuthValidateSerializer(UserBaseSerializer):
 class RegisterValidateSerializer(UserBaseSerializer):
     phone_number = serializers.CharField(max_length=20, required=False)
     birthdate = serializers.DateField(required=False)
+    first_name = serializers.CharField(max_length=50, required=False)
+    last_name = serializers.CharField(max_length=50, required=False)
 
     def validate_email(self, email):
         try:

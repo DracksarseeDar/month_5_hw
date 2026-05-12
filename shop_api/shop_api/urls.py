@@ -18,4 +18,3 @@ urlpatterns = [
 ]
 
 urlpatterns += swagger.urlpatterns
-# 30:11

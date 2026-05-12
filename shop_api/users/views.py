@@ -32,6 +32,9 @@ class RegistrationAPIView(CreateAPIView):
         password = serializer.validated_data['password']
         phone_number = serializer.validated_data.get('phone_number', '')
         birthdate = serializer.validated_data.get('birthdate')
+        first_name = serializer.validated_data.get('first_name', '')
+        last_name = serializer.validated_data.get('last_name', '')
+
 
         with transaction.atomic():
             user = CustomUser.objects.create_user(
@@ -39,7 +42,10 @@ class RegistrationAPIView(CreateAPIView):
                 password=password,
                 phone_number=phone_number,
                 birthdate=birthdate, 
-                is_active=False
+                is_active=False ,
+                first_name =first_name,
+                last_name =last_name,
+                registration_source='local'
             )
 
             code = ''.join(random.choices(string.digits, k=6))
@@ -75,7 +81,6 @@ class ConfirmUserAPIView(GenericAPIView):
         return Response(
             status=status.HTTP_200_OK,
             data={
-                'message': 'Аккаунт успешно активирован',
                 'access': str(refresh.access_token),
                 'refresh': str(refresh),
             }
